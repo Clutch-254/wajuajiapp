@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class Chatscreen extends StatefulWidget {
@@ -33,24 +32,33 @@ class _ChatscreenState extends State<Chatscreen> with TickerProviderStateMixin {
   ];
 
   final List<Map<String, dynamic>> notifications = [
+    {'title': 'New message in Pop Culture Forum', 'time': '5m ago'},
+    {'title': 'Mentioned in a thread: Flutter Help', 'time': '1h ago'},
+    {'title': 'New reply from AnimeFan2025', 'time': '3h ago'},
+  ];
+
+  final List<Map<String, String>> solutions = [
     {
-      'title': 'New message in Pop Culture Forum',
-      'time': '5m ago',
+      'issue': 'Homelessness in Urban Areas',
+      'solution': 'City-funded shelters and job programs.',
     },
     {
-      'title': 'Mentioned in a thread: Flutter Help',
-      'time': '1h ago',
+      'issue': 'Endometriosis Awareness',
+      'solution': 'Educational campaigns and subsidized healthcare.',
     },
     {
-      'title': 'New reply from AnimeFan2025',
-      'time': '3h ago',
+      'issue': 'Climate Change',
+      'solution': 'Community tree planting initiatives.',
     },
   ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 3,
+      vsync: this,
+    ); // 👈 Updated tab count
   }
 
   @override
@@ -64,6 +72,7 @@ class _ChatscreenState extends State<Chatscreen> with TickerProviderStateMixin {
           tabs: const [
             Tab(text: 'Chats'),
             Tab(text: 'Notifications'),
+            Tab(text: 'Solutions'), // 👈 New Solutions tab
           ],
         ),
       ),
@@ -104,11 +113,34 @@ class _ChatscreenState extends State<Chatscreen> with TickerProviderStateMixin {
               );
             },
           ),
+
+          // Solutions Tab
+          ListView.builder(
+            itemCount: solutions.length,
+            itemBuilder: (context, index) {
+              final item = solutions[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                elevation: 3,
+                child: ListTile(
+                  title: Text(item['issue']!),
+                  subtitle: Text(item['solution']!),
+                  trailing: const Icon(
+                    Icons.lightbulb_outline,
+                    color: Colors.amber,
+                  ),
+                  onTap: () {
+                    // TODO: Navigate to full solution detail or discussion
+                  },
+                ),
+              );
+            },
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Create new chat, navigate to new message screen, etc.
+          // TODO: Create new chat or add solution
         },
         backgroundColor: Colors.deepPurple,
         child: const Icon(Icons.chat),

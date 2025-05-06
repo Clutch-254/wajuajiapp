@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:mjuajiapp0/user/articlleceatenwrite.dart';
 
 class ArticleReader extends StatefulWidget {
   const ArticleReader({super.key});
@@ -40,17 +40,19 @@ class _ArticleReaderState extends State<ArticleReader> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredArticles = articles.where((article) {
-      final query = searchQuery.toLowerCase();
-      return article['title'].toLowerCase().contains(query) ||
-          article['genre'].toLowerCase().contains(query);
-    }).toList();
+    final filteredArticles =
+        articles.where((article) {
+          final query = searchQuery.toLowerCase();
+          return article['title'].toLowerCase().contains(query) ||
+              article['genre'].toLowerCase().contains(query);
+        }).toList();
 
     final categories = {
       for (var article in filteredArticles)
-        article['genre']: filteredArticles
-            .where((a) => a['genre'] == article['genre'])
-            .toList()
+        article['genre']:
+            filteredArticles
+                .where((a) => a['genre'] == article['genre'])
+                .toList(),
     };
 
     return Scaffold(
@@ -76,93 +78,101 @@ class _ArticleReaderState extends State<ArticleReader> {
           ),
           Expanded(
             child: ListView(
-              children: categories.entries.map((entry) {
-                final genre = entry.key;
-                final genreArticles = entry.value;
+              children:
+                  categories.entries.map((entry) {
+                    final genre = entry.key;
+                    final genreArticles = entry.value;
 
-                return Padding(
-                  padding: const EdgeInsets.only(left: 12, bottom: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        genre,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        height: 200,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: genreArticles.length,
-                          itemBuilder: (context, index) {
-                            final article = genreArticles[index];
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => ArticleDetailScreen(
-                                      title: article['title'],
-                                      author: article['author'],
-                                      content: article['content'],
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 12, bottom: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            genre,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 200,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: genreArticles.length,
+                              itemBuilder: (context, index) {
+                                final article = genreArticles[index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (_) => ArticleDetailScreen(
+                                              title: article['title'],
+                                              author: article['author'],
+                                              content: article['content'],
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 150,
+                                    margin: const EdgeInsets.only(right: 12),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.teal.shade50,
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 4,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          height: 100,
+                                          width: double.infinity,
+                                          color: Colors.teal.shade100,
+                                          child: const Icon(
+                                            Icons.article,
+                                            size: 40,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          article['title'],
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          article['author'],
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 );
                               },
-                              child: Container(
-                                width: 150,
-                                margin: const EdgeInsets.only(right: 12),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.teal.shade50,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      height: 100,
-                                      width: double.infinity,
-                                      color: Colors.teal.shade100,
-                                      child: const Icon(Icons.article,
-                                          size: 40, color: Colors.white),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      article['title'],
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      article['author'],
-                                      style: const TextStyle(
-                                          fontSize: 12, color: Colors.grey),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              }).toList(),
+                    );
+                  }).toList(),
             ),
           ),
         ],
@@ -172,8 +182,12 @@ class _ArticleReaderState extends State<ArticleReader> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           child: ElevatedButton.icon(
             onPressed: () {
-              // TODO: Add navigation to write screen
-              debugPrint("Navigate to write article screen");
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Articlleceatenwrite(),
+                ),
+              );
             },
             icon: const Icon(Icons.edit),
             label: const Text("Write"),
@@ -213,23 +227,14 @@ class ArticleDetailScreen extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             Text(
               "By $author",
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 20),
-            Text(
-              content,
-              style: const TextStyle(fontSize: 16, height: 1.5),
-            ),
+            Text(content, style: const TextStyle(fontSize: 16, height: 1.5)),
           ],
         ),
       ),

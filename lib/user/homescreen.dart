@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:mjuajiapp0/user/solutions.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -57,19 +58,21 @@ class _NewsHomeScreenState extends State<HomeScreen> {
             isVideo: item['isVideo'],
             onAvatarTap: () {
               // Placeholder for avatar/username navigation
-              debugPrint('Navigate to creator profile');
+              debugPrint('will navigate to creator profile');
             },
             onCaptionTap: () {
               // Placeholder for caption navigation
-              debugPrint('Navigate to full post');
+              debugPrint('will mavigate to full post');
             },
             onReadArticle: () {
               // Placeholder for article navigation
-              debugPrint('Navigate to article');
+              debugPrint('Will navigate to article');
             },
             onSolution: () {
-              // Placeholder for solution navigation
-              debugPrint('Navigate to solution');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Solutions()),
+              );
             },
           );
         },
