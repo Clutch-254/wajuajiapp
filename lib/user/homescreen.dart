@@ -14,8 +14,9 @@ class _NewsHomeScreenState extends State<HomeScreen> {
   final List<Map<String, dynamic>> _newsItems = [
     //place holders for the content before we complete it and make it more functional
     {
-      'creatorName': 'Dr. Alice Warren',
-      'avatar': null, // tutareplace with actual image baadae its just a place  holder 
+      'creatorName': 'Dr. Alice Waweru',
+      'avatar':
+          null, // tutareplace with actual image baadae its just a place  holder
       'caption': 'Endometriosis Awareness - Live Now!',
       'isLive': true,
       'isVideo': true,
@@ -188,7 +189,6 @@ class NewsContentCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 //navigates user to the article where they can read more
                 ElevatedButton.icon(
                   onPressed: onReadArticle,
