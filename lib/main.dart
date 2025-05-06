@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mjuajiapp0/user/articalreader.dart';
 import 'package:mjuajiapp0/user/homescreen.dart';
+import 'package:mjuajiapp0/user/newsection.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +33,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: HomeScreen(),
+      home: Newsection(),
     );
   }
 }
