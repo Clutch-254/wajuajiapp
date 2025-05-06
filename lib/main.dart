@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mjuajiapp0/user/articalreader.dart';
+import 'package:mjuajiapp0/user/chatscreen.dart';
 import 'package:mjuajiapp0/user/homescreen.dart';
 import 'package:mjuajiapp0/user/newsection.dart';
 
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: Newsection(),
+      home: Chatscreen(),
     );
   }
 }
