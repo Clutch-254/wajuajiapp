@@ -13,6 +13,82 @@ class _ProfilescreenState extends State<Profilescreen> {
   int subscriberCount = 128;
   int collaboratorCount = 14;
   bool showCreatedContent = false;
+  bool showSavedContent = false;
+
+  // Content creation options dialog
+  void _showContentCreationOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Create Content',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+              const SizedBox(height: 20),
+              _buildContentOption(
+                context,
+                Icons.videocam_outlined,
+                'Post Video',
+                () {
+                  // TODO: Implement post video functionality
+                  Navigator.pop(context);
+                },
+              ),
+              _buildContentOption(
+                context,
+                Icons.live_tv_outlined,
+                'Start Live',
+                () {
+                  // TODO: Implement start live functionality
+                  Navigator.pop(context);
+                },
+              ),
+              _buildContentOption(
+                context,
+                Icons.article_outlined,
+                'Write Article',
+                () {
+                  // TODO: Implement write article functionality
+                  Navigator.pop(context);
+                },
+              ),
+              _buildContentOption(
+                context,
+                Icons.movie_creation_outlined,
+                'Post Entertainment',
+                () {
+                  // TODO: Implement post entertainment functionality
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Helper method to build content creation options
+  Widget _buildContentOption(
+    BuildContext context,
+    IconData icon,
+    String title,
+    VoidCallback onTap,
+  ) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.black),
+      title: Text(title),
+      onTap: onTap,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +208,14 @@ class _ProfilescreenState extends State<Profilescreen> {
               children: [
                 IconButton(
                   onPressed: () {
-                    // TODO: Navigate to content creation
+                    // Show content creation options
+                    _showContentCreationOptions(context);
+
+                    // Reset other views when create button is pressed
+                    setState(() {
+                      showCreatedContent = false;
+                      showSavedContent = false;
+                    });
                   },
                   icon: const Icon(
                     Icons.add_circle_outline,
@@ -144,21 +227,32 @@ class _ProfilescreenState extends State<Profilescreen> {
                 const SizedBox(width: 30),
                 IconButton(
                   onPressed: () {
-                    // TODO: Navigate to saved/bookmarked content
+                    // Toggle saved content view
+                    setState(() {
+                      showSavedContent = !showSavedContent;
+                      showCreatedContent = false; // Hide created content
+                    });
                   },
-                  icon: const Icon(Icons.bookmark_border, color: Colors.black),
+                  icon: Icon(
+                    showSavedContent ? Icons.bookmark : Icons.bookmark_border,
+                    color: Colors.black,
+                  ),
                   tooltip: 'Saved Content',
                   iconSize: 30,
                 ),
                 const SizedBox(width: 30),
                 IconButton(
                   onPressed: () {
+                    // Toggle created content view
                     setState(() {
                       showCreatedContent = !showCreatedContent;
+                      showSavedContent = false; // Hide saved content
                     });
                   },
-                  icon: const Icon(
-                    Icons.grid_view_rounded,
+                  icon: Icon(
+                    showCreatedContent
+                        ? Icons.grid_on
+                        : Icons.grid_view_rounded,
                     color: Colors.black,
                   ),
                   tooltip: 'My Content',
@@ -169,134 +263,142 @@ class _ProfilescreenState extends State<Profilescreen> {
 
             const Divider(height: 40, color: Colors.black12),
 
-            // Conditional: Created Content or Saved Content
+            // Conditional Content Display
             if (showCreatedContent)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      "My Created Content",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 100,
-                    margin: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.black12),
-                    ),
-                    child: const Center(
-                      child: Text("Created content placeholder"),
-                    ),
-                  ),
-                ],
-              )
+              _buildCreatedContentSection()
+            else if (showSavedContent)
+              _buildSavedContentSection()
             else
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      "Saved Videos",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
+              const Padding(
+                padding: EdgeInsets.all(20),
+                child: Center(
+                  child: Text(
+                    "Select an option above to view your content",
+                    style: TextStyle(color: Colors.black54),
                   ),
-                  Container(
-                    height: 100,
-                    margin: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.black12),
-                    ),
-                    child: const Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.play_circle_outline, color: Colors.black),
-                          SizedBox(width: 8),
-                          Text("Video content placeholder"),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      "Saved Comics",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 100,
-                    margin: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.black12),
-                    ),
-                    child: const Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.auto_stories_outlined,
-                            color: Colors.black,
-                          ),
-                          SizedBox(width: 8),
-                          Text("Comics content placeholder"),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      "Saved Articles",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 100,
-                    margin: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.black12),
-                    ),
-                    child: const Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.article_outlined, color: Colors.black),
-                          SizedBox(width: 8),
-                          Text("Article content placeholder"),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
           ],
         ),
       ),
+    );
+  }
+
+  // Created Content Section
+  Widget _buildCreatedContentSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            "My Created Content",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ),
+        Container(
+          height: 100,
+          margin: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.black12),
+          ),
+          child: const Center(child: Text("Created content placeholder")),
+        ),
+      ],
+    );
+  }
+
+  // Saved Content Section
+  Widget _buildSavedContentSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Saved Videos Section
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            "Saved Videos",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ),
+        Container(
+          height: 100,
+          margin: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.black12),
+          ),
+          child: const Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.play_circle_outline, color: Colors.black),
+                SizedBox(width: 8),
+                Text("Video content placeholder"),
+              ],
+            ),
+          ),
+        ),
+
+        // Saved Comics Section
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            "Saved Comics",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ),
+        Container(
+          height: 100,
+          margin: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.black12),
+          ),
+          child: const Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.auto_stories_outlined, color: Colors.black),
+                SizedBox(width: 8),
+                Text("Comics content placeholder"),
+              ],
+            ),
+          ),
+        ),
+
+        // Saved Articles Section
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            "Saved Articles",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ),
+        Container(
+          height: 100,
+          margin: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.black12),
+          ),
+          child: const Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.article_outlined, color: Colors.black),
+                SizedBox(width: 8),
+                Text("Article content placeholder"),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

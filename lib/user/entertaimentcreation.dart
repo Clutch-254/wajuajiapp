@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class Entertaimentcreation extends StatefulWidget {
@@ -18,9 +17,9 @@ class _EntertaimentcreationState extends State<Entertaimentcreation> {
 
   void handleSubmit() {
     // Logic to upload or save content
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Content submitted!')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Content submitted!')));
 
     // Clear form
     titleController.clear();
@@ -32,9 +31,14 @@ class _EntertaimentcreationState extends State<Entertaimentcreation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create New Content'),
+        title: const Text(
+          'Create New Content',
+          style: TextStyle(color: Colors.black),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -46,18 +50,28 @@ class _EntertaimentcreationState extends State<Entertaimentcreation> {
             ),
             Wrap(
               spacing: 10,
-              children: contentTypes.map((type) {
-                return ChoiceChip(
-                  label: Text(type),
-                  selected: selectedType == type,
-                  onSelected: (selected) {
-                    setState(() {
-                      selectedType = type;
-                    });
-                  },
-                  selectedColor: Colors.deepPurpleAccent,
-                );
-              }).toList(),
+              children:
+                  contentTypes.map((type) {
+                    return ChoiceChip(
+                      label: Text(
+                        type,
+                        style: TextStyle(
+                          color:
+                              selectedType == type
+                                  ? Colors.white
+                                  : Colors.black,
+                        ),
+                      ),
+                      selected: selectedType == type,
+                      onSelected: (selected) {
+                        setState(() {
+                          selectedType = type;
+                        });
+                      },
+                      selectedColor: Colors.black,
+                      backgroundColor: Colors.grey[200],
+                    );
+                  }).toList(),
             ),
             const SizedBox(height: 20),
 
@@ -67,6 +81,9 @@ class _EntertaimentcreationState extends State<Entertaimentcreation> {
               decoration: const InputDecoration(
                 labelText: 'Title',
                 border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black, width: 2),
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -77,6 +94,9 @@ class _EntertaimentcreationState extends State<Entertaimentcreation> {
               decoration: const InputDecoration(
                 labelText: 'Genre',
                 border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black, width: 2),
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -86,10 +106,14 @@ class _EntertaimentcreationState extends State<Entertaimentcreation> {
               controller: descriptionController,
               maxLines: 6,
               decoration: InputDecoration(
-                labelText: selectedType == 'Novel'
-                    ? 'Write your story'
-                    : 'Description or upload instructions',
+                labelText:
+                    selectedType == 'Novel'
+                        ? 'Write your story'
+                        : 'Description or upload instructions',
                 border: const OutlineInputBorder(),
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black, width: 2),
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -100,8 +124,12 @@ class _EntertaimentcreationState extends State<Entertaimentcreation> {
               icon: const Icon(Icons.publish),
               label: const Text('Publish'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ),
 
@@ -111,20 +139,41 @@ class _EntertaimentcreationState extends State<Entertaimentcreation> {
             Container(
               height: 100,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
+                border: Border.all(color: Colors.black12),
                 borderRadius: BorderRadius.circular(8),
               ),
               alignment: Alignment.center,
-              child: Text(
-                selectedType == 'Novel'
-                    ? 'Text-only content'
-                    : 'Tap to upload pages or cover (coming soon)',
-                style: const TextStyle(color: Colors.grey),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    selectedType == 'Novel'
+                        ? Icons.text_fields
+                        : Icons.file_upload_outlined,
+                    color: Colors.black54,
+                    size: 28,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    selectedType == 'Novel'
+                        ? 'Text-only content'
+                        : 'Tap to upload pages or cover (coming soon)',
+                    style: const TextStyle(color: Colors.black54),
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    genreController.dispose();
+    super.dispose();
   }
 }

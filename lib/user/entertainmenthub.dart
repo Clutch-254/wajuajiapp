@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mjuajiapp0/user/entertaimentcreation.dart';
 
 class Entertainmenthub extends StatefulWidget {
   const Entertainmenthub({super.key});
@@ -93,7 +94,6 @@ class _EntertainmenthubState extends State<Entertainmenthub> {
 
             const SizedBox(height: 20),
 
-            // Enlarged content list
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -181,8 +181,12 @@ class _EntertainmenthubState extends State<Entertainmenthub> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           child: ElevatedButton.icon(
             onPressed: () {
-              // Navigate to a content creation screen
-              // Navigator.push(context, MaterialPageRoute(builder: (_) => YourCreateScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Entertaimentcreation(),
+                ),
+              );
             },
             icon: const Icon(Icons.add),
             label: const Text("Create"),
