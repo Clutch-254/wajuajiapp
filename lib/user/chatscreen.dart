@@ -55,24 +55,25 @@ class _ChatscreenState extends State<Chatscreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-      length: 3,
-      vsync: this,
-    ); // 👈 Updated tab count
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chats & Notifications'),
-        backgroundColor: Colors.deepPurple,
+        title: const Text(''),
+        backgroundColor: Colors.white,
+        elevation: 0,
         bottom: TabBar(
           controller: _tabController,
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: Colors.black,
           tabs: const [
-            Tab(text: 'Chats'),
-            Tab(text: 'Notifications'),
-            Tab(text: 'Solutions'), // 👈 New Solutions tab
+            Tab(icon: Icon(Icons.chat_bubble_outline)),
+            Tab(icon: Icon(Icons.notifications_outlined)),
+            Tab(icon: Icon(Icons.lightbulb_outline)),
           ],
         ),
       ),
@@ -86,7 +87,11 @@ class _ChatscreenState extends State<Chatscreen> with TickerProviderStateMixin {
               final chat = chats[index];
               return ListTile(
                 leading: CircleAvatar(
-                  child: Icon(chat['isGroup'] ? Icons.group : Icons.person),
+                  backgroundColor: Colors.black,
+                  child: Icon(
+                    chat['isGroup'] ? Icons.group : Icons.person,
+                    color: Colors.white,
+                  ),
                 ),
                 title: Text(chat['name']),
                 subtitle: Text(chat['lastMessage']),
@@ -104,7 +109,13 @@ class _ChatscreenState extends State<Chatscreen> with TickerProviderStateMixin {
             itemBuilder: (context, index) {
               final notif = notifications[index];
               return ListTile(
-                leading: const Icon(Icons.notifications),
+                leading: const CircleAvatar(
+                  backgroundColor: Colors.black,
+                  child: Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.white,
+                  ),
+                ),
                 title: Text(notif['title']),
                 trailing: Text(
                   notif['time'],
@@ -122,12 +133,18 @@ class _ChatscreenState extends State<Chatscreen> with TickerProviderStateMixin {
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: ListTile(
-                  title: Text(item['issue']!),
+                  title: Text(
+                    item['issue']!,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Text(item['solution']!),
                   trailing: const Icon(
                     Icons.lightbulb_outline,
-                    color: Colors.amber,
+                    color: Colors.black,
                   ),
                   onTap: () {
                     // TODO: Navigate to full solution detail or discussion
@@ -142,8 +159,8 @@ class _ChatscreenState extends State<Chatscreen> with TickerProviderStateMixin {
         onPressed: () {
           // TODO: Create new chat or add solution
         },
-        backgroundColor: Colors.deepPurple,
-        child: const Icon(Icons.chat),
+        backgroundColor: Colors.black,
+        child: const Icon(Icons.chat, color: Colors.white),
       ),
     );
   }

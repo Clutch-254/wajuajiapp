@@ -56,127 +56,164 @@ class _ArticleReaderState extends State<ArticleReader> {
     };
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Articles'),
-        centerTitle: true,
-        backgroundColor: Colors.teal,
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: TextField(
-              onChanged: (value) => setState(() => searchQuery = value),
-              decoration: InputDecoration(
-                hintText: 'Search by genre or title...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header Title
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Row(
+                children: const [
+                  Text(
+                    'Articles',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: TextField(
+                onChanged: (value) => setState(() => searchQuery = value),
+                decoration: InputDecoration(
+                  hintText: 'Search by genre or title...',
+                  hintStyle: TextStyle(color: Colors.grey[600]),
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
             ),
-          ),
-          Expanded(
-            child: ListView(
-              children:
-                  categories.entries.map((entry) {
-                    final genre = entry.key;
-                    final genreArticles = entry.value;
 
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 12, bottom: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            genre,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+            const SizedBox(height: 10),
+
+            // Article List by Genre
+            Expanded(
+              child: ListView(
+                children:
+                    categories.entries.map((entry) {
+                      final genre = entry.key;
+                      final genreArticles = entry.value;
+
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 12, bottom: 24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              genre,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          SizedBox(
-                            height: 200,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: genreArticles.length,
-                              itemBuilder: (context, index) {
-                                final article = genreArticles[index];
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (_) => ArticleDetailScreen(
-                                              title: article['title'],
-                                              author: article['author'],
-                                              content: article['content'],
-                                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              height: 220,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: genreArticles.length,
+                                itemBuilder: (context, index) {
+                                  final article = genreArticles[index];
+
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (_) => ArticleDetailScreen(
+                                                title: article['title'],
+                                                author: article['author'],
+                                                content: article['content'],
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      width: 180,
+                                      margin: const EdgeInsets.only(right: 12),
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 4,
+                                            offset: Offset(0, 2),
+                                          ),
+                                        ],
                                       ),
-                                    );
-                                  },
-                                  child: Container(
-                                    width: 150,
-                                    margin: const EdgeInsets.only(right: 12),
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Colors.teal.shade50,
-                                      borderRadius: BorderRadius.circular(10),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 4,
-                                          offset: Offset(0, 2),
-                                        ),
-                                      ],
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            height: 100,
+                                            width: double.infinity,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[400],
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: const Center(
+                                              child: Icon(
+                                                Icons.article,
+                                                size: 40,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            article['title'],
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            article['author'],
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          height: 100,
-                                          width: double.infinity,
-                                          color: Colors.teal.shade100,
-                                          child: const Icon(
-                                            Icons.article,
-                                            size: 40,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          article['title'],
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          article['author'],
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+
+      // Write Article Button
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -193,7 +230,8 @@ class _ArticleReaderState extends State<ArticleReader> {
             label: const Text("Write"),
             style: ElevatedButton.styleFrom(
               minimumSize: const Size(double.infinity, 50),
-              backgroundColor: Colors.teal,
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
             ),
           ),
         ),
@@ -202,6 +240,7 @@ class _ArticleReaderState extends State<ArticleReader> {
   }
 }
 
+// Detailed View for Articles
 class ArticleDetailScreen extends StatelessWidget {
   final String title;
   final String author;
@@ -217,9 +256,10 @@ class ArticleDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.black,
         title: const Text("Article"),
-        backgroundColor: Colors.teal,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
