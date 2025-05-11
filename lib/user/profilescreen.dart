@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Profilescreen extends StatefulWidget {
   const Profilescreen({super.key});
@@ -8,12 +10,40 @@ class Profilescreen extends StatefulWidget {
 }
 
 class _ProfilescreenState extends State<Profilescreen> {
-  String username = 'User123';
-  String bio = 'This is a short bio about the user.';
-  int subscriberCount = 128;
-  int collaboratorCount = 14;
+  String username = '';
+  String bio = '';
+  int subscriberCount = 0;
+  int collaboratorCount = 0;
   bool showCreatedContent = false;
   bool showSavedContent = false;
+
+  // Fetch user data from Firestore
+  Future<void> _fetchUserProfile() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
+
+      if (doc.exists) {
+        setState(() {
+          username = doc['username'] ?? 'User123';
+          bio = doc['bio'] ?? 'This is a short bio about the user.';
+          subscriberCount = doc['subscriberCount'] ?? 0;
+          collaboratorCount = doc['collaboratorCount'] ?? 0;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserProfile();
+  }
 
   // Content creation options dialog
   void _showContentCreationOptions(BuildContext context) {
@@ -38,7 +68,6 @@ class _ProfilescreenState extends State<Profilescreen> {
                 Icons.videocam_outlined,
                 'Post Video',
                 () {
-                  // TODO: Implement post video functionality
                   Navigator.pop(context);
                 },
               ),
@@ -47,7 +76,6 @@ class _ProfilescreenState extends State<Profilescreen> {
                 Icons.live_tv_outlined,
                 'Start Live',
                 () {
-                  // TODO: Implement start live functionality
                   Navigator.pop(context);
                 },
               ),
@@ -56,7 +84,6 @@ class _ProfilescreenState extends State<Profilescreen> {
                 Icons.article_outlined,
                 'Write Article',
                 () {
-                  // TODO: Implement write article functionality
                   Navigator.pop(context);
                 },
               ),
@@ -65,7 +92,6 @@ class _ProfilescreenState extends State<Profilescreen> {
                 Icons.movie_creation_outlined,
                 'Post Entertainment',
                 () {
-                  // TODO: Implement post entertainment functionality
                   Navigator.pop(context);
                 },
               ),
@@ -111,7 +137,6 @@ class _ProfilescreenState extends State<Profilescreen> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-
             // Profile Picture
             Center(
               child: CircleAvatar(
@@ -120,9 +145,7 @@ class _ProfilescreenState extends State<Profilescreen> {
                 child: const Icon(Icons.person, size: 50, color: Colors.white),
               ),
             ),
-
             const SizedBox(height: 10),
-
             // Username and Edit Profile
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -165,7 +188,6 @@ class _ProfilescreenState extends State<Profilescreen> {
                 ],
               ),
             ),
-
             // Bio
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
@@ -175,9 +197,7 @@ class _ProfilescreenState extends State<Profilescreen> {
                 style: const TextStyle(fontSize: 14, color: Colors.black54),
               ),
             ),
-
             const SizedBox(height: 10),
-
             // Subscriber and Collaborator Count Buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -199,19 +219,15 @@ class _ProfilescreenState extends State<Profilescreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 20),
-
             // Action Buttons: Create, Bookmark, and Created Content
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
                   onPressed: () {
-                    // Show content creation options
                     _showContentCreationOptions(context);
 
-                    // Reset other views when create button is pressed
                     setState(() {
                       showCreatedContent = false;
                       showSavedContent = false;
@@ -227,10 +243,9 @@ class _ProfilescreenState extends State<Profilescreen> {
                 const SizedBox(width: 30),
                 IconButton(
                   onPressed: () {
-                    // Toggle saved content view
                     setState(() {
                       showSavedContent = !showSavedContent;
-                      showCreatedContent = false; // Hide created content
+                      showCreatedContent = false;
                     });
                   },
                   icon: Icon(
@@ -243,10 +258,9 @@ class _ProfilescreenState extends State<Profilescreen> {
                 const SizedBox(width: 30),
                 IconButton(
                   onPressed: () {
-                    // Toggle created content view
                     setState(() {
                       showCreatedContent = !showCreatedContent;
-                      showSavedContent = false; // Hide saved content
+                      showSavedContent = false;
                     });
                   },
                   icon: Icon(
@@ -260,9 +274,7 @@ class _ProfilescreenState extends State<Profilescreen> {
                 ),
               ],
             ),
-
             const Divider(height: 40, color: Colors.black12),
-
             // Conditional Content Display
             if (showCreatedContent)
               _buildCreatedContentSection()
@@ -315,7 +327,6 @@ class _ProfilescreenState extends State<Profilescreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Saved Videos Section
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
@@ -342,8 +353,6 @@ class _ProfilescreenState extends State<Profilescreen> {
             ),
           ),
         ),
-
-        // Saved Comics Section
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
@@ -366,34 +375,6 @@ class _ProfilescreenState extends State<Profilescreen> {
                 Icon(Icons.auto_stories_outlined, color: Colors.black),
                 SizedBox(width: 8),
                 Text("Comics content placeholder"),
-              ],
-            ),
-          ),
-        ),
-
-        // Saved Articles Section
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(
-            "Saved Articles",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-        ),
-        Container(
-          height: 100,
-          margin: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black12),
-          ),
-          child: const Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.article_outlined, color: Colors.black),
-                SizedBox(width: 8),
-                Text("Article content placeholder"),
               ],
             ),
           ),

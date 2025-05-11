@@ -1,355 +1,131 @@
 import 'package:flutter/material.dart';
+import 'package:mjuajiapp0/user/auth_service.dart';
 import 'package:mjuajiapp0/user/loginscreen.dart';
 
-class Signupscreen extends StatefulWidget {
-  const Signupscreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  State<Signupscreen> createState() => _SignupscreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _SignupscreenState extends State<Signupscreen> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
-  bool _agreeToTerms = false;
-  final _formKey = GlobalKey<FormState>();
+class _SignupScreenState extends State<SignupScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _bioController = TextEditingController(); // New controller
+  final _authService = AuthService();
+  bool _isLoading = false;
+  String? _errorMessage;
 
-  void _register() {
-    if (_formKey.currentState!.validate() && _agreeToTerms) {
-      // TODO: Implement registration logic
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Processing registration...')),
-      );
+  Future<void> _signUp() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
 
-      // For demo purposes, navigate to profile after registration
-      // In a real app, you would register with a backend first
-      // Navigator.pushReplacementNamed(context, '/profile');
-    } else if (!_agreeToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please agree to Terms & Conditions')),
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final username = _usernameController.text.trim();
+    final bio =
+        _bioController.text.trim().isEmpty
+            ? 'This is a short bio about the user.'
+            : _bioController.text.trim();
+
+    if (email.isEmpty || password.isEmpty || username.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please enter username, email, and password';
+        _isLoading = false;
+      });
+      return;
+    }
+
+    final error = await _authService.signUp(email, password, username, bio);
+    if (error != null) {
+      setState(() {
+        _errorMessage = error;
+        _isLoading = false;
+      });
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     }
   }
 
-  void _navigateToLogin() {
-    // TODO: Navigate back to login screen
-    // Navigator.pop(context);
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final error = await _authService.signInWithGoogle();
+    if (error != null) {
+      setState(() {
+        _errorMessage = error;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Create Account',
-          style: TextStyle(color: Colors.black),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
-      body: SafeArea(
+      appBar: AppBar(title: const Text('Sign Up')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // App Logo or Brand Icon
-                Center(
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: const BoxDecoration(
-                      color: Colors.black,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.person_add,
-                      color: Colors.white,
-                      size: 40,
-                    ),
+          child: Column(
+            children: [
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
                   ),
                 ),
-
-                const SizedBox(height: 24),
-
-                // Welcome Text
-                const Text(
-                  'Join Us',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              TextField(
+                controller: _usernameController,
+                decoration: const InputDecoration(labelText: 'Username'),
+              ),
+              TextField(
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+              ),
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Password'),
+              ),
+              TextField(
+                controller: _bioController,
+                decoration: const InputDecoration(
+                  labelText: 'Short Bio (optional)',
                 ),
-
-                const SizedBox(height: 8),
-
-                const Text(
-                  'Create an account to get started',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.black54, fontSize: 16),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Full Name Field
-                TextFormField(
-                  controller: _nameController,
-                  textCapitalization: TextCapitalization.words,
-                  decoration: const InputDecoration(
-                    labelText: 'Full Name',
-                    hintText: 'Enter your full name',
-                    prefixIcon: Icon(Icons.person_outline),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 2),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your name';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 16),
-
-                // Email Field
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'Enter your email',
-                    prefixIcon: Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 2),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    if (!RegExp(
-                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                    ).hasMatch(value)) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 16),
-
-                // Password Field
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Create a password',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    border: const OutlineInputBorder(),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 2),
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+              ),
+              const SizedBox(height: 20),
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: _signUp,
+                        child: const Text('Sign Up'),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a password';
-                    }
-                    if (value.length < 8) {
-                      return 'Password must be at least 8 characters';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 16),
-
-                // Confirm Password Field
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  obscureText: _obscureConfirmPassword,
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    hintText: 'Confirm your password',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    border: const OutlineInputBorder(),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 2),
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureConfirmPassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: _signInWithGoogle,
+                        icon: const Icon(Icons.login),
+                        label: const Text('Sign Up with Google'),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureConfirmPassword = !_obscureConfirmPassword;
-                        });
-                      },
-                    ),
+                    ],
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please confirm your password';
-                    }
-                    if (value != _passwordController.text) {
-                      return 'Passwords do not match';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 16),
-
-                // Terms and Conditions Checkbox
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _agreeToTerms,
-                      activeColor: Colors.black,
-                      onChanged: (value) {
-                        setState(() {
-                          _agreeToTerms = value ?? false;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-
-                // Register Button
-                ElevatedButton(
-                  onPressed: _register,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'CREATE ACCOUNT',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Or Sign Up With
-                const Row(
-                  children: [
-                    Expanded(child: Divider(thickness: 1)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        'Or sign up with',
-                        style: TextStyle(color: Colors.black54),
-                      ),
-                    ),
-                    Expanded(child: Divider(thickness: 1)),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-
-                // Social Media Login
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _socialSignupButton(Icons.g_mobiledata, 'Google'),
-                    _socialSignupButton(Icons.facebook, 'Facebook'),
-                    _socialSignupButton(Icons.apple, 'Apple'),
-                  ],
-                ),
-
-                const SizedBox(height: 32),
-
-                // Already have an account? Login
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Already have an account?"),
-                    TextButton(
-                      onPressed: (){
-                         Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Loginscreen()),
-              );
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                      ),
-                      child: const Text(
-                        'Log in',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
     );
-  }
-
-  Widget _socialSignupButton(IconData icon, String platform) {
-    return InkWell(
-      onTap: () {
-        // TODO: Implement social signup
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Sign up with $platform')));
-      },
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black12),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(icon, size: 32, color: Colors.black87),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
   }
 }

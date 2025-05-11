@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mjuajiapp0/user/solutions.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _NewsHomeScreenState();
@@ -143,7 +143,7 @@ class NewsContentCard extends StatelessWidget {
   final VoidCallback onSave;
 
   const NewsContentCard({
-    Key? key,
+    super.key,
     required this.backgroundColor,
     required this.creatorName,
     required this.caption,
@@ -161,7 +161,7 @@ class NewsContentCard extends StatelessWidget {
     required this.onComment,
     required this.onShare,
     required this.onSave,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

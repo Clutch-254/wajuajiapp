@@ -1,5 +1,6 @@
 # Miscellaneous
 *.class
+*.vscode
 *.log
 *.pyc
 *.swp
@@ -11,6 +12,10 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
+
+dependencies.txt
+firebase_options.dart
+google-services.json
 
 # IntelliJ related
 *.iml
