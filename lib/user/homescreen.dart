@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mjuajiapp0/user/solutions.dart';
+import 'package:video_player/video_player.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,47 +12,68 @@ class HomeScreen extends StatefulWidget {
 
 class _NewsHomeScreenState extends State<HomeScreen> {
   final PageController _pageController = PageController();
+  List<Map<String, dynamic>> _newsItems = [];
 
-  final List<Map<String, dynamic>> _newsItems = [
-    //place holders for the content before we complete it and make it more functional
-    {
-      'creatorName': 'Dr. Alice Waweru',
-      'avatar':
-          null, // tutareplace with actual image baadae its just a place  holder
-      'caption': 'Endometriosis Awareness - Live Now!',
-      'isLive': true,
-      'isVideo': true,
-      'bgColor': Colors.teal.shade200,
-      'likes': 1245,
-      'liked': false,
-      'saved': false,
-      'comments': 85,
-    },
-    {
-      'creatorName': 'Health Weekly',
-      'avatar': null, // same here
-      'caption': 'New research shows promising treatment options',
-      'isLive': false,
-      'isVideo': true,
-      'bgColor': Colors.blue.shade200,
-      'likes': 876,
-      'liked': false,
-      'saved': false,
-      'comments': 42,
-    },
-    {
-      'creatorName': 'Politics Daily',
-      'avatar': null,
-      'caption': 'Breaking down the new healthcare policy',
-      'isLive': false,
-      'isVideo': false,
-      'bgColor': Colors.deepOrange.shade200,
-      'likes': 523,
-      'liked': false,
-      'saved': false,
-      'comments': 31,
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchPosts();
+  }
+
+  Future<void> _fetchPosts() async {
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('posts')
+            .orderBy('timestamp', descending: true)
+            .get();
+
+    final List<Map<String, dynamic>> fetchedPosts =
+        snapshot.docs.map((doc) {
+          final data = doc.data();
+          return {
+            'creatorName': data['userId'] ?? 'Unknown',
+            'caption': data['caption'] ?? '',
+            'videoUrl': data['videoUrl'] ?? '',
+            'isVideo': true,
+            'isLive': false,
+            'likes': 0,
+            'liked': false,
+            'saved': false,
+            'comments': 0,
+            'bgColor': Colors.black,
+          };
+        }).toList();
+
+    final placeholderPosts = [
+      {
+        'creatorName': 'Dr. Alice Waweru',
+        'caption': 'Endometriosis Awareness - Live Now!',
+        'isLive': true,
+        'isVideo': true,
+        'bgColor': Colors.teal.shade200,
+        'likes': 1245,
+        'liked': false,
+        'saved': false,
+        'comments': 85,
+      },
+      {
+        'creatorName': 'Health Weekly',
+        'caption': 'New research shows promising treatment options',
+        'isLive': false,
+        'isVideo': true,
+        'bgColor': Colors.blue.shade200,
+        'likes': 876,
+        'liked': false,
+        'saved': false,
+        'comments': 42,
+      },
+    ];
+
+    if (!mounted) return;
+    setState(() {
+      _newsItems = [...fetchedPosts, ...placeholderPosts];
+    });
+  }
 
   void _toggleLike(int index) {
     setState(() {
@@ -72,63 +95,55 @@ class _NewsHomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView.builder(
-        scrollDirection: Axis.vertical,
-        controller: _pageController,
-        itemCount: _newsItems.length,
-        itemBuilder: (context, index) {
-          final item = _newsItems[index];
-          return NewsContentCard(
-            backgroundColor: item['bgColor'],
-            creatorName: item['creatorName'],
-            caption: item['caption'],
-            isLive: item['isLive'],
-            isVideo: item['isVideo'],
-            likes: item['likes'],
-            isLiked: item['liked'],
-            isSaved: item['saved'],
-            comments: item['comments'],
-            onAvatarTap: () {
-              // Placeholder for avatar/username navigation
-              debugPrint('will navigate to creator profile');
-            },
-            onCaptionTap: () {
-              // Placeholder for caption navigation
-              debugPrint('will mavigate to full post');
-            },
-            onReadArticle: () {
-              // Placeholder for article navigation
-              debugPrint('Will navigate to article');
-            },
-            onSolution: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Solutions()),
-              );
-            },
-            onLike: () => _toggleLike(index),
-            onComment: () {
-              // Placeholder for comment functionality
-              debugPrint('Opening comments for post $index');
-            },
-            onShare: () {
-              // Placeholder for share functionality
-              debugPrint('Sharing post $index');
-            },
-            onSave: () => _toggleSave(index),
-          );
-        },
-      ),
+      body:
+          _newsItems.isEmpty
+              ? const Center(child: CircularProgressIndicator())
+              : PageView.builder(
+                scrollDirection: Axis.vertical,
+                controller: _pageController,
+                itemCount: _newsItems.length,
+                itemBuilder: (context, index) {
+                  final item = _newsItems[index];
+                  return NewsContentCard(
+                    backgroundColor: item['bgColor'],
+                    creatorName: item['creatorName'],
+                    caption: item['caption'],
+                    videoUrl: item['videoUrl'],
+                    isLive: item['isLive'],
+                    isVideo: item['isVideo'],
+                    likes: item['likes'],
+                    isLiked: item['liked'],
+                    isSaved: item['saved'],
+                    comments: item['comments'],
+                    onAvatarTap: () {},
+                    onCaptionTap: () {},
+                    onReadArticle: () {},
+                    onSolution: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Solutions(),
+                        ),
+                      );
+                    },
+                    onLike: () => _toggleLike(index),
+                    onComment: () {},
+                    onShare: () {},
+                    onSave: () => _toggleSave(index),
+                  );
+                },
+              ),
     );
   }
 }
 
-class NewsContentCard extends StatelessWidget {
+class NewsContentCard extends StatefulWidget {
   final Color backgroundColor;
   final String creatorName;
   final String caption;
   final bool isLive;
   final bool isVideo;
+  final String? videoUrl;
   final int likes;
   final bool isLiked;
   final bool isSaved;
@@ -147,6 +162,7 @@ class NewsContentCard extends StatelessWidget {
     required this.backgroundColor,
     required this.creatorName,
     required this.caption,
+    this.videoUrl,
     required this.isLive,
     required this.isVideo,
     required this.likes,
@@ -164,20 +180,60 @@ class NewsContentCard extends StatelessWidget {
   });
 
   @override
+  State<NewsContentCard> createState() => _NewsContentCardState();
+}
+
+class _NewsContentCardState extends State<NewsContentCard> {
+  VideoPlayerController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.videoUrl != null && widget.videoUrl!.isNotEmpty) {
+      _controller = VideoPlayerController.network(widget.videoUrl!)
+        ..initialize().then((_) {
+          setState(() {
+            _controller!.play();
+            _controller!.setLooping(true);
+          });
+        });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      color: backgroundColor,
+      color: widget.backgroundColor,
       child: Stack(
         children: [
           Center(
             child:
-                isVideo
-                    ? Icon(
-                      isLive ? Icons.wifi_tethering : Icons.play_circle_fill,
-                      size: 100,
-                      color: Colors.white,
-                    )
-                    : Icon(
+                widget.isVideo
+                    ? (_controller != null && _controller!.value.isInitialized
+                        ? GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (_controller!.value.isPlaying) {
+                                _controller!.pause();
+                              } else {
+                                _controller!.play();
+                              }
+                            });
+                          },
+                          onDoubleTap: widget.onLike,
+                          child: AspectRatio(
+                            aspectRatio: _controller!.value.aspectRatio,
+                            child: VideoPlayer(_controller!),
+                          ),
+                        )
+                        : const CircularProgressIndicator())
+                    : const Icon(
                       Icons.article_outlined,
                       size: 100,
                       color: Colors.white,
@@ -187,7 +243,7 @@ class NewsContentCard extends StatelessWidget {
             left: 16,
             bottom: 140,
             child: GestureDetector(
-              onTap: onAvatarTap,
+              onTap: widget.onAvatarTap,
               child: Row(
                 children: [
                   const CircleAvatar(
@@ -197,14 +253,14 @@ class NewsContentCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    creatorName,
+                    widget.creatorName,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),
-                  if (isLive)
+                  if (widget.isLive)
                     Container(
                       margin: const EdgeInsets.only(left: 8),
                       padding: const EdgeInsets.symmetric(
@@ -232,9 +288,9 @@ class NewsContentCard extends StatelessWidget {
             bottom: 90,
             right: 16,
             child: GestureDetector(
-              onTap: onCaptionTap,
+              onTap: widget.onCaptionTap,
               child: Text(
-                caption,
+                widget.caption,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -243,25 +299,23 @@ class NewsContentCard extends StatelessWidget {
               ),
             ),
           ),
-          // Social interaction buttons
           Positioned(
             left: 16,
             bottom: 190,
             child: Row(
               children: [
-                // Like button
                 InkWell(
-                  onTap: onLike,
+                  onTap: widget.onLike,
                   child: Row(
                     children: [
                       Icon(
-                        isLiked ? Icons.favorite : Icons.favorite_border,
-                        color: isLiked ? Colors.red : Colors.white,
+                        widget.isLiked ? Icons.favorite : Icons.favorite_border,
+                        color: widget.isLiked ? Colors.red : Colors.white,
                         size: 24,
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        likes.toString(),
+                        widget.likes.toString(),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -271,9 +325,8 @@ class NewsContentCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 20),
-                // Comment button
                 InkWell(
-                  onTap: onComment,
+                  onTap: widget.onComment,
                   child: Row(
                     children: [
                       const Icon(
@@ -283,7 +336,7 @@ class NewsContentCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        comments.toString(),
+                        widget.comments.toString(),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -293,9 +346,8 @@ class NewsContentCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 20),
-                // Share button
                 InkWell(
-                  onTap: onShare,
+                  onTap: widget.onShare,
                   child: const Icon(
                     Icons.share_outlined,
                     color: Colors.white,
@@ -303,12 +355,11 @@ class NewsContentCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 20),
-                // Save button
                 InkWell(
-                  onTap: onSave,
+                  onTap: widget.onSave,
                   child: Icon(
-                    isSaved ? Icons.bookmark : Icons.bookmark_border,
-                    color: isSaved ? Colors.yellow : Colors.white,
+                    widget.isSaved ? Icons.bookmark : Icons.bookmark_border,
+                    color: widget.isSaved ? Colors.yellow : Colors.white,
                     size: 24,
                   ),
                 ),
@@ -322,9 +373,8 @@ class NewsContentCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                //navigates user to the article where they can read more
                 ElevatedButton.icon(
-                  onPressed: onReadArticle,
+                  onPressed: widget.onReadArticle,
                   icon: const Icon(Icons.chrome_reader_mode),
                   label: const Text("Read Article"),
                   style: ElevatedButton.styleFrom(
@@ -332,10 +382,8 @@ class NewsContentCard extends StatelessWidget {
                     foregroundColor: Colors.black,
                   ),
                 ),
-
-                //button that will navigate user to the solution page of that specific issue or content
                 ElevatedButton.icon(
-                  onPressed: onSolution,
+                  onPressed: widget.onSolution,
                   icon: const Icon(Icons.lightbulb),
                   label: const Text("Solution"),
                   style: ElevatedButton.styleFrom(

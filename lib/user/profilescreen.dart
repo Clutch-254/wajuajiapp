@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mjuajiapp0/user/post_video_screen.dart';
 
 class Profilescreen extends StatefulWidget {
   const Profilescreen({super.key});
@@ -69,6 +70,10 @@ class _ProfilescreenState extends State<Profilescreen> {
                 'Post Video',
                 () {
                   Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => PostVideoScreen()),
+                  );
                 },
               ),
               _buildContentOption(
