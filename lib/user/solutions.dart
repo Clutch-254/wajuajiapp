@@ -209,8 +209,8 @@ class _SolutionsState extends State<Solutions> {
       floatingActionButton: FloatingActionButton(
         onPressed: _addIssue,
         backgroundColor: Colors.teal,
-        child: const Icon(Icons.add),
         tooltip: 'Add New Issue',
+        child: const Icon(Icons.add),
       ),
     );
   }
